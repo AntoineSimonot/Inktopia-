@@ -1,0 +1,21 @@
+.hero-inner{
+    display: flex;
+    flex-direction: column;
+}
+
+.hero-inner div{
+    display: flex;
+    align-items: center;
+}
+
+.hero-inner div span{
+  margin: 0 10px;
+}
+
+.hour{
+  margin: 10px;
+}
+
+.tatooist{
+  margin: 10px;
+}

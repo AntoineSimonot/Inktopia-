@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title><%= title %></title>
+    <link href="https://fonts.googleapis.com/css?family=Lato:400,400i|Roboto:500" rel="stylesheet">
+    <link rel="stylesheet" href="/css/style.css">
+    <script src="https://unpkg.com/scrollreveal@4.0.0/dist/scrollreveal.min.js"></script>
+    <script src="https://cdn.socket.io/4.1.1/socket.io.min.js" integrity="sha384-cdrFIqe3RasCMNE0jeFG9xJHog/tgOVC1E9Lzve8LQN1g5WUHo0Kvk1mawWjxX7a" crossorigin="anonymous"></script>
+</head>
+<body class="is-boxed has-animations">
+    <div class="body-wrap boxed-container">
+
+        <main>
+            <section class="hero text-center">
+                <div class="container-sm">
+                    <div class="hero-inner">
+                        <h1 class="hero-title h2-mobile mt-0 is-revealing">tatoueur</h1>
+                        <input type="date" id="date" value="">
+
+                        <div class="text">                              
+                            <a href="" class="hour">10</a>
+                            <a href="" class="hour">15</a>
+                            <a href="" class="hour">20</a>
+                        </div>
+
+                    </div>
+                </div>
+            </section>
+
+        </main>
+
+    </div>
+
+    <script>
+
+        window.addEventListener('DOMContentLoaded', () => {
+
+
+            let hours = document.querySelectorAll(".hour")
+            let tattooist_id = window.location.href.split("/").pop()
+
+            document.querySelector('#date').value = new Date().toJSON().slice(0,10)
+            let date = document.querySelector('#date').value
+            checkIfSlotTaken()
+            
+            document.querySelector("#date").addEventListener('change', (event) => {
+                date = document.querySelector('#date').value
+
+                checkIfSlotTaken()
+            })
+
+            for (const hour of hours) {
+                hour.addEventListener('click', (event) =>{
+                    event.preventDefault()
+
+                    if (!hour.classList.contains("taken") ) {
+                        hour.style.color = "red"
+                        hour.classList.add("taken");
+                            fetch("http://localhost:3000/slots", {
+                            method: "POST",
+                            headers: {
+                                'Content-Type': "application/x-www-form-urlencoded"
+                            },
+                            body: `hour=${hour.innerHTML}&date=${date}&user=4&tattooist_id=${tattooist_id}`
+                        })      
+                    }                
+                })
+            }
+            function checkIfSlotTaken() {
+                
+                for (const hour of hours) {
+                    fetch(`http://localhost:3000/slots?hour=${hour.innerHTML}&date=${date}&tattooist_id=${tattooist_id}`).then((result) => {
+                        result.json().then((data) => {
+                            if (data.data != null || checkIfSlofIsPassed(hour) == true ) {
+                                hour.style.color = "red"
+                                hour.classList.add("taken");
+                                
+                            }
+                            else{
+                                hour.style.color = "black"
+                                hour.classList.remove("taken");
+                            }
+                        })
+                    })
+                }
+            }
+
+            function checkIfSlofIsPassed(hour) {
+                if (date < new Date().toJSON().slice(0,10) || date <= new Date().toJSON().slice(0,10) && hour.innerHTML <= new Date().getHours()) {
+                    return true
+                }
+                else{
+                    return false
+                }
+            }
+        })
+
+        
+
+    </script>
+
+    </body>
+</html>
